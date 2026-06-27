@@ -464,10 +464,10 @@ must be validated by a licensed healthcare professional.
             
     else:
         st.markdown(
-            """<div style="background-color: #ffffff; border: 1px dashed #cbd5e1; border-radius: 8px; padding: 24px; text-align: center; color: #475569; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);">
+            """<div style="background-color: #151b2d; border: 1px dashed #2e3a52; border-radius: 8px; padding: 24px; text-align: center; color: #94a3b8;">
 <div style="font-size: 32px; margin-bottom: 8px;">📋</div>
-<h4 style="margin: 0 0 4px 0; color: #0f172a;">Awaiting Clinical Analysis</h4>
-<p style="font-size: 13px; margin: 0; color: #475569;">Provide patient biometrics on the left and click <strong>Run Disease Analysis</strong> to generate screening report.</p>
+<h4 style="margin: 0 0 4px 0; color: #ffffff;">Awaiting Clinical Analysis</h4>
+<p style="font-size: 13px; margin: 0; color: #94a3b8;">Provide patient biometrics on the left and click <strong>Run Disease Analysis</strong> to generate screening report.</p>
 </div>""",
             unsafe_allow_html=True
         )

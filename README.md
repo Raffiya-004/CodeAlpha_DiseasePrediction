@@ -22,15 +22,15 @@ The application is structured as a streamlined, single-page clinical diagnostics
   * **Random Forest Classifier**: Ensemble bootstrap trees model optimized on raw clinical parameters.
   * **SVM (Support Vector Classifier)**: Maximum-margin classifier fitted with probability estimators.
   * **XGBoost Classifier**: Extreme gradient boosted trees model for high-efficiency tabular modeling.
-* **Premium Light Clinical Screening Portal UI**: 
+* **Premium Dark Clinical Screening Portal UI**: 
   * A single-page, responsive, dual-column diagnostic form layout.
-  * Centered branding featuring a medical icon and a blue-to-indigo gradient title.
+  * Centered branding featuring a medical icon and a blue-to-sky gradient title.
   * Segmented horizontal tab/pill selectors with medical icons for switching between diseases (styled horizontal radio buttons with glowing gradients).
-  * Left column: A clean two-column Patient Biometrics Form with white inputs, custom focus glows, and CSS-hidden spinner controls.
-  * Right column: Predict outcomes (Dynamic Red/Green Alert Banners, Risk Levels: Low/Moderate/High, Confidence Metric Progress Bars, and Clinical Action Recommendations).
+  * Left column: A clean two-column Patient Biometrics Form with dark-slate inputs, custom focus glows, and CSS-hidden spinner controls.
+  * Right column: Predict outcomes (Dynamic Red/Green Glowing Alert Banners, Risk Levels: Low/Moderate/High, Confidence Metric Progress Bars, and Clinical Action Recommendations).
 * **Automated Best Model Selection**: The backend dynamically evaluates the test accuracies of all four trained models and automatically selects the highest performing model for prediction.
 * **Trained Models Persistence**: Estimators and standard scalers are serialized to disk (`models/` folder) and cached in Streamlit resource memory, ensuring zero training lag on start.
-* **New Clinical Features**:
+* **Clinical Features**:
   * **Biometric Tooltips**: Detailed helper notes showing standard clinical healthy ranges for all number inputs.
   * **Reset Form**: A secondary button that resets all biometrics to standard clinical defaults and clears prediction states.
   * **Export Clinical Report**: A download button that generates a formatted text report (`.txt` file) with date, biometrics, risk levels, and action plans.
@@ -43,7 +43,7 @@ The application is structured as a streamlined, single-page clinical diagnostics
 CodeAlpha_DiseasePrediction/
 │
 ├── .streamlit/
-│   └── config.toml           # Enforces light clinical theme by default
+│   └── config.toml           # Enforces dark clinical theme by default
 │
 ├── data/
 │   ├── diabetes.csv           # Cleaned Pima Indians Diabetes Dataset
@@ -59,7 +59,7 @@ CodeAlpha_DiseasePrediction/
 │   ├── download_data.py       # Pre-fetches diabetes and heart datasets
 │   ├── data_loader.py         # Imputes missing values and slices Wisconsin features
 │   ├── model_trainer.py       # Trains, persists, and evaluates LR/RF/SVM/XGBoost
-│   └── utils.py               # Injects light theme CSS overrides
+│   └── utils.py               # Injects dark theme CSS overrides
 │
 ├── app.py                     # Central Streamlit web application
 ├── requirements.txt           # Dependencies catalog
