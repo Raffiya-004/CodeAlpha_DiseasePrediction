@@ -20,7 +20,7 @@ from src.data_loader import (
 from src.model_trainer import get_complete_model_results
 from src.utils import inject_custom_css
 
-# Inject premium dark theme styling
+# Inject premium light theme styling
 inject_custom_css()
 
 # Session state setup
@@ -32,6 +32,8 @@ if 'last_disease' not in st.session_state:
     st.session_state.last_disease = ""
 if 'force_retrain' not in st.session_state:
     st.session_state.force_retrain = False
+if 'reset_counter' not in st.session_state:
+    st.session_state.reset_counter = 0
 
 @st.cache_resource
 def get_dataset_and_models(disease_type, force_retrain=False):
@@ -58,13 +60,14 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# --- TOP BAR: DISEASE SELECTION ---
-disease_sel = st.radio(
+# --- TOP BAR: DISEASE SELECTION WITH ICONS ---
+disease_sel_raw = st.radio(
     "Select Target Disease", 
-    ["Diabetes", "Heart Disease", "Breast Cancer"], 
+    ["🩸 Diabetes", "🫀 Heart Disease", "🎗️ Breast Cancer"], 
     horizontal=True,
     label_visibility="collapsed"
 )
+disease_sel = disease_sel_raw.split(" ", 1)[1] # Extracts "Diabetes", "Heart Disease", "Breast Cancer"
 
 # Reset prediction state if disease selection changes
 if disease_sel != st.session_state.last_disease:
@@ -114,59 +117,189 @@ with col_left:
         if disease_sel == "Diabetes":
             row1_col1, row1_col2 = st.columns(2)
             with row1_col1:
-                patient_inputs['Pregnancies'] = st.number_input("Pregnancies", min_value=0, max_value=20, value=1)
-                patient_inputs['BMI'] = st.number_input("BMI (kg/m²)", min_value=0.0, max_value=70.0, value=30.5, step=0.1)
-                patient_inputs['Insulin'] = st.number_input("Insulin (μU/mL)", min_value=0, max_value=1000, value=80)
-                patient_inputs['SkinThickness'] = st.number_input("Skin Thickness (mm)", min_value=0, max_value=100, value=23)
+                patient_inputs['Pregnancies'] = st.number_input(
+                    "Pregnancies", min_value=0, max_value=20, value=1, 
+                    key=f"Pregnancies_{st.session_state.reset_counter}",
+                    help="Number of times pregnant."
+                )
+                patient_inputs['BMI'] = st.number_input(
+                    "BMI (kg/m²)", min_value=0.0, max_value=70.0, value=30.5, step=0.1, 
+                    key=f"BMI_{st.session_state.reset_counter}",
+                    help="Body Mass Index. Normal range is 18.5 - 24.9 kg/m²."
+                )
+                patient_inputs['Insulin'] = st.number_input(
+                    "Insulin (μU/mL)", min_value=0, max_value=1000, value=80, 
+                    key=f"Insulin_{st.session_state.reset_counter}",
+                    help="2-Hour serum insulin. Normal range is under 166 μU/mL."
+                )
+                patient_inputs['SkinThickness'] = st.number_input(
+                    "Skin Thickness (mm)", min_value=0, max_value=100, value=23, 
+                    key=f"SkinThickness_{st.session_state.reset_counter}",
+                    help="Triceps skin fold thickness. Normal range is 10 - 30 mm."
+                )
             with row1_col2:
-                patient_inputs['Glucose'] = st.number_input("Glucose (mg/dL)", min_value=0, max_value=300, value=110)
-                patient_inputs['Age'] = st.number_input("Age (Years)", min_value=1, max_value=120, value=33)
-                patient_inputs['BloodPressure'] = st.number_input("Blood Pressure (mmHg)", min_value=0, max_value=200, value=72)
-                patient_inputs['DiabetesPedigreeFunction'] = st.number_input("Pedigree Value", min_value=0.01, max_value=3.00, value=0.47, step=0.01)
+                patient_inputs['Glucose'] = st.number_input(
+                    "Glucose (mg/dL)", min_value=0, max_value=300, value=110, 
+                    key=f"Glucose_{st.session_state.reset_counter}",
+                    help="Plasma glucose concentration. Normal fasting level is under 100 mg/dL."
+                )
+                patient_inputs['Age'] = st.number_input(
+                    "Age (Years)", min_value=1, max_value=120, value=33, 
+                    key=f"Age_{st.session_state.reset_counter}",
+                    help="Patient age in years."
+                )
+                patient_inputs['BloodPressure'] = st.number_input(
+                    "Blood Pressure (mmHg)", min_value=0, max_value=200, value=72, 
+                    key=f"BloodPressure_{st.session_state.reset_counter}",
+                    help="Diastolic blood pressure. Normal range is 60 - 80 mmHg."
+                )
+                patient_inputs['DiabetesPedigreeFunction'] = st.number_input(
+                    "Pedigree Value", min_value=0.01, max_value=3.00, value=0.47, step=0.01, 
+                    key=f"DiabetesPedigreeFunction_{st.session_state.reset_counter}",
+                    help="Diabetes pedigree score (family history index; higher indicates greater genetic link)."
+                )
                 
         elif disease_sel == "Heart Disease":
             row1_col1, row1_col2 = st.columns(2)
             with row1_col1:
-                patient_inputs['age'] = st.number_input("Age (Years)", min_value=1, max_value=120, value=54)
-                sex_val = st.selectbox("Sex", ["Male", "Female"])
+                patient_inputs['age'] = st.number_input(
+                    "Age (Years)", min_value=1, max_value=120, value=54,
+                    key=f"age_{st.session_state.reset_counter}",
+                    help="Patient age in years."
+                )
+                sex_val = st.selectbox(
+                    "Sex", ["Male", "Female"],
+                    key=f"sex_{st.session_state.reset_counter}"
+                )
                 patient_inputs['sex'] = 1 if sex_val == "Male" else 0
-                cp_val = st.selectbox("Chest Pain (CP) Type", ["Asymptomatic", "Non-anginal", "Atypical", "Typical"])
+                
+                cp_val = st.selectbox(
+                    "Chest Pain (CP) Type", ["Asymptomatic", "Non-anginal", "Atypical", "Typical"],
+                    key=f"cp_{st.session_state.reset_counter}",
+                    help="Typical: angina; Atypical: non-anginal chest pain; Asymptomatic: no symptoms."
+                )
                 cp_mapping = {"Typical": 0, "Atypical": 1, "Non-anginal": 2, "Asymptomatic": 3}
                 patient_inputs['cp'] = cp_mapping[cp_val]
-                patient_inputs['trestbps'] = st.number_input("Resting BP (mmHg)", min_value=50, max_value=250, value=130)
-                patient_inputs['chol'] = st.number_input("Cholesterol (mg/dL)", min_value=50, max_value=700, value=240)
-                fbs_val = st.selectbox("Fasting Sugar > 120", ["No", "Yes"])
+                
+                patient_inputs['trestbps'] = st.number_input(
+                    "Resting BP (mmHg)", min_value=50, max_value=250, value=130,
+                    key=f"trestbps_{st.session_state.reset_counter}",
+                    help="Resting blood pressure. Normal range is 90 - 120 mmHg."
+                )
+                patient_inputs['chol'] = st.number_input(
+                    "Cholesterol (mg/dL)", min_value=50, max_value=700, value=240,
+                    key=f"chol_{st.session_state.reset_counter}",
+                    help="Serum cholesterol. Normal range is under 200 mg/dL."
+                )
+                fbs_val = st.selectbox(
+                    "Fasting Sugar > 120 mg/dL", ["No", "Yes"],
+                    key=f"fbs_{st.session_state.reset_counter}",
+                    help="Fasting blood sugar. Yes indicates > 120 mg/dL."
+                )
                 patient_inputs['fbs'] = 1 if fbs_val == "Yes" else 0
-                restecg_val = st.selectbox("Resting ECG", ["Normal", "ST-T Anomaly", "LV Hypertrophy"])
+                
+                restecg_val = st.selectbox(
+                    "Resting ECG", ["Normal", "ST-T Anomaly", "LV Hypertrophy"],
+                    key=f"restecg_{st.session_state.reset_counter}",
+                    help="Electrocardiographic results. LV Hypertrophy: left ventricular hypertrophy."
+                )
                 restecg_mapping = {"Normal": 0, "ST-T Anomaly": 1, "LV Hypertrophy": 2}
                 patient_inputs['restecg'] = restecg_mapping[restecg_val]
             with row1_col2:
-                patient_inputs['thalach'] = st.number_input("Max Heart Rate", min_value=50, max_value=250, value=150)
-                exang_val = st.selectbox("Exercise Angina", ["No", "Yes"])
+                patient_inputs['thalach'] = st.number_input(
+                    "Max Heart Rate", min_value=50, max_value=250, value=150,
+                    key=f"thalach_{st.session_state.reset_counter}",
+                    help="Maximum heart rate achieved during exercise stress validation."
+                )
+                exang_val = st.selectbox(
+                    "Exercise Angina", ["No", "Yes"],
+                    key=f"exang_{st.session_state.reset_counter}",
+                    help="Exercise-induced angina symptoms."
+                )
                 patient_inputs['exang'] = 1 if exang_val == "Yes" else 0
-                patient_inputs['oldpeak'] = st.number_input("ST Depression", min_value=0.0, max_value=10.0, value=1.0, step=0.1)
-                slope_val = st.selectbox("ST Slope", ["Upsloping", "Flat", "Downsloping"])
+                
+                patient_inputs['oldpeak'] = st.number_input(
+                    "ST Depression", min_value=0.0, max_value=10.0, value=1.0, step=0.1,
+                    key=f"oldpeak_{st.session_state.reset_counter}",
+                    help="ST depression induced by exercise relative to rest (lower is better)."
+                )
+                slope_val = st.selectbox(
+                    "ST Slope", ["Upsloping", "Flat", "Downsloping"],
+                    key=f"slope_{st.session_state.reset_counter}",
+                    help="The slope of the peak exercise ST segment."
+                )
                 slope_mapping = {"Upsloping": 0, "Flat": 1, "Downsloping": 2}
                 patient_inputs['slope'] = slope_mapping[slope_val]
-                patient_inputs['ca'] = st.selectbox("Vessels by Fluoroscopy", [0, 1, 2, 3, 4])
-                thal_val = st.selectbox("Thalassemia Profile", ["Normal", "Fixed Defect", "Reversable Defect", "Undefined"])
+                
+                patient_inputs['ca'] = st.selectbox(
+                    "Vessels by Fluoroscopy", [0, 1, 2, 3, 4],
+                    key=f"ca_{st.session_state.reset_counter}",
+                    help="Number of major vessels (0-4) colored by fluoroscopy."
+                )
+                thal_val = st.selectbox(
+                    "Thalassemia Profile", ["Normal", "Fixed Defect", "Reversable Defect", "Undefined"],
+                    key=f"thal_{st.session_state.reset_counter}",
+                    help="Thalassemia genetic blood scan status."
+                )
                 thal_mapping = {"Undefined": 0, "Normal": 1, "Fixed Defect": 2, "Reversable Defect": 3}
                 patient_inputs['thal'] = thal_mapping[thal_val]
                 
         else: # Breast Cancer
             row1_col1, row1_col2 = st.columns(2)
             with row1_col1:
-                patient_inputs['mean radius'] = st.number_input("Mean Radius", min_value=1.0, max_value=50.0, value=14.1, step=0.1)
-                patient_inputs['mean perimeter'] = st.number_input("Mean Perimeter", min_value=10.0, max_value=300.0, value=92.0, step=0.1)
-                patient_inputs['mean smoothness'] = st.number_input("Mean Smoothness", min_value=0.01, max_value=0.50, value=0.10, step=0.01)
-                patient_inputs['mean concavity'] = st.number_input("Mean Concavity", min_value=0.00, max_value=1.00, value=0.09, step=0.01)
+                patient_inputs['mean radius'] = st.number_input(
+                    "Mean Radius", min_value=1.0, max_value=50.0, value=14.1, step=0.1,
+                    key=f"radius_{st.session_state.reset_counter}",
+                    help="Mean tumor core cell radius."
+                )
+                patient_inputs['mean perimeter'] = st.number_input(
+                    "Mean Perimeter", min_value=10.0, max_value=300.0, value=92.0, step=0.1,
+                    key=f"perimeter_{st.session_state.reset_counter}",
+                    help="Mean tumor perimeter cell size."
+                )
+                patient_inputs['mean smoothness'] = st.number_input(
+                    "Mean Smoothness", min_value=0.01, max_value=0.50, value=0.10, step=0.01,
+                    key=f"smoothness_{st.session_state.reset_counter}",
+                    help="Local variation in tumor boundary radius lengths."
+                )
+                patient_inputs['mean concavity'] = st.number_input(
+                    "Mean Concavity", min_value=0.00, max_value=1.00, value=0.09, step=0.01,
+                    key=f"concavity_{st.session_state.reset_counter}",
+                    help="Severity of concave portions of the tumor boundary."
+                )
             with row1_col2:
-                patient_inputs['mean texture'] = st.number_input("Mean Texture", min_value=1.0, max_value=60.0, value=19.3, step=0.1)
-                patient_inputs['mean area'] = st.number_input("Mean Area", min_value=50.0, max_value=4000.0, value=654.0, step=1.0)
-                patient_inputs['mean compactness'] = st.number_input("Mean Compactness", min_value=0.01, max_value=0.80, value=0.10, step=0.01)
-                patient_inputs['mean concave points'] = st.number_input("Mean Concave Points", min_value=0.00, max_value=0.50, value=0.05, step=0.01)
+                patient_inputs['mean texture'] = st.number_input(
+                    "Mean Texture", min_value=1.0, max_value=60.0, value=19.3, step=0.1,
+                    key=f"texture_{st.session_state.reset_counter}",
+                    help="Standard deviation of gray-scale values across cells."
+                )
+                patient_inputs['mean area'] = st.number_input(
+                    "Mean Area", min_value=50.0, max_value=4000.0, value=654.0, step=1.0,
+                    key=f"area_{st.session_state.reset_counter}",
+                    help="Mean tumor core cell area."
+                )
+                patient_inputs['mean compactness'] = st.number_input(
+                    "Mean Compactness", min_value=0.01, max_value=0.80, value=0.10, step=0.01,
+                    key=f"compactness_{st.session_state.reset_counter}",
+                    help="Tumor perimeter^2 / area - 1.0."
+                )
+                patient_inputs['mean concave points'] = st.number_input(
+                    "Mean Concave Points", min_value=0.00, max_value=0.50, value=0.05, step=0.01,
+                    key=f"concave_pts_{st.session_state.reset_counter}",
+                    help="Number of concave portions of the tumor boundary."
+                )
 
-    run_prediction = st.button("🩺 Run Disease Analysis", type="primary", use_container_width=True)
+    # Action Buttons Grid: Run Analysis & Reset Form
+    act_col1, act_col2 = st.columns([7, 3])
+    with act_col1:
+        run_prediction = st.button("🔮 Run Disease Analysis", type="primary", use_container_width=True)
+    with act_col2:
+        reset_form = st.button("🔄 Reset Form", type="secondary", use_container_width=True)
+        if reset_form:
+            st.session_state.reset_counter += 1
+            st.session_state.predicted = False
+            st.session_state.prediction_results = {}
+            st.rerun()
 
     if run_prediction:
         input_df = pd.DataFrame([patient_inputs])
@@ -289,12 +422,52 @@ with col_right:
                 st.markdown(f"• {r}")
             st.caption("⚠️ **Disclaimer:** Statistical risk assessment tool. Results must be validated by clinical professionals.")
             st.caption(f"*Prediction Generated Using {model_name}*")
+            
+            # Feature: Export Clinical Report Download Button
+            report_text = f"""========================================
+CLINICAL DIAGNOSTIC SCREENING REPORT
+========================================
+Date: {pd.Timestamp.now().strftime('%Y-%m-%d %H:%M:%S')}
+Target Assessment: {disease_sel}
+Model Utilized: {model_name}
+----------------------------------------
+PATIENT BIOMETRICS RECORDED:
+"""
+            for k, v in patient_inputs.items():
+                k_clean = k.replace('_', ' ').title()
+                report_text += f"- {k_clean}: {v}\n"
+                
+            report_text += f"""----------------------------------------
+DIAGNOSTIC OUTCOME:
+Risk Assessment: {risk_level.upper()}
+Confidence Score: {confidence:.1f}%
+----------------------------------------
+CLINICAL ACTION RECOMMENDATIONS:
+"""
+            for r in recs:
+                report_text += f"- {r}\n"
+                
+            report_text += """----------------------------------------
+Disclaimer: This is a statistical risk screening report generated
+by a machine learning model. It is for clinical assistant use and
+must be validated by a licensed healthcare professional.
+========================================
+"""
+            st.markdown("<div style='margin-top: 10px;'></div>", unsafe_allow_html=True)
+            st.download_button(
+                label="📥 Export Clinical Report",
+                data=report_text,
+                file_name=f"clinical_report_{disease_sel.lower().replace(' ', '_')}.txt",
+                mime="text/plain",
+                use_container_width=True
+            )
+            
     else:
         st.markdown(
-            """<div style="background-color: #151b2d; border: 1px dashed #2e3a52; border-radius: 8px; padding: 24px; text-align: center; color: #94a3b8;">
+            """<div style="background-color: #ffffff; border: 1px dashed #cbd5e1; border-radius: 8px; padding: 24px; text-align: center; color: #475569; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);">
 <div style="font-size: 32px; margin-bottom: 8px;">📋</div>
-<h4 style="margin: 0 0 4px 0; color: #ffffff;">Awaiting Clinical Analysis</h4>
-<p style="font-size: 13px; margin: 0; color: #94a3b8;">Provide patient biometrics on the left and click <strong>Run Disease Analysis</strong> to generate screening report.</p>
+<h4 style="margin: 0 0 4px 0; color: #0f172a;">Awaiting Clinical Analysis</h4>
+<p style="font-size: 13px; margin: 0; color: #475569;">Provide patient biometrics on the left and click <strong>Run Disease Analysis</strong> to generate screening report.</p>
 </div>""",
             unsafe_allow_html=True
         )

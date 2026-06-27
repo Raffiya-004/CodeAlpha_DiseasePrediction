@@ -6,3 +6,43 @@ plotly>=5.15.0
 joblib>=1.3.0
 matplotlib>=3.7.0
 xgboost>=1.7.0
+#  1. Open the Project in VS Code
+Open your terminal (PowerShell or Command Prompt) and run:
+
+powershell
+
+
+code C:\Users\Raffiya\OneDrive\Desktop\Code_Alpha_ML
+(Or in VS Code, go to File > Open Folder... and select C:\Users\Raffiya\OneDrive\Desktop\Code_Alpha_ML)
+
+2. Run these commands in the VS Code Terminal
+Open the integrated terminal in VS Code (using Ctrl + ` or Terminal > New Terminal):
+
+A. Set up and Activate a Virtual Environment (Recommended)
+powershell
+
+
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+B. Install the Project Dependencies
+powershell
+
+
+pip install -r requirements.txt
+C. Pre-fetch the Medical Datasets
+powershell
+
+
+python src/download_data.py
+D. Launch the Clinical Portal
+powershell
+
+
+streamlit run app.py
+3. Access the Portal
+Once started, Streamlit will print the local URL. Open your browser and navigate to:
+
+url
+
+
+http://localhost:8501
